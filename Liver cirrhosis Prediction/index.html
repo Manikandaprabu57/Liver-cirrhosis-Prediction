@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Prediction</title>
+    <style>
+        /* General Page Styles */
+        body {
+            background-color: #f3f9ff;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* Container Style */
+        .container {
+            max-width: 500px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Header and Cartoon Image */
+        h1 {
+            color: #4c8bf5;
+            margin-bottom: 10px;
+        }
+
+        .cartoon-image {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 50%;
+        }
+
+        /* Form Field Styles */
+        label {
+            font-size: 1.1em;
+            color: #4c4c4c;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        /* Button Style */
+        button {
+            background-color: #4c8bf5;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3a6ebf;
+        }
+
+        /* Result Display Style */
+        #result {
+            font-size: 1.2em;
+            color: #4c8bf5;
+            margin-top: 15px;
+        }
+    </style>
+    <script>
+        async function makePrediction() {
+            try {
+                const data = {
+                    Age: parseInt(document.getElementById('age').value),
+                    Bilirubin: parseFloat(document.getElementById('bilirubin').value),
+                    Albumin: parseFloat(document.getElementById('albumin').value),
+                    Ascites: document.getElementById('ascites').value === "Yes" ? 1 : 0,
+                    Sex: document.getElementById('sex').value === "Male" ? 1 : 0
+                };
+
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                document.getElementById('result').innerText = `Prediction: Stage ${result.prediction}`;
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <img src="image.png" alt="Cartoon Doctor" class="cartoon-image">
+        <h1>Health Prediction</h1>
+        <p>Fill in the details to predict your health stage</p>
+
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+
+        <label for="bilirubin">Bilirubin:</label>
+        <input type="number" id="bilirubin" name="bilirubin" step="0.1" required>
+
+        <label for="albumin">Albumin:</label>
+        <input type="number" id="albumin" name="albumin" step="0.1" required>
+
+        <label for="ascites">Ascites:</label>
+        <select id="ascites" name="ascites">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="sex">Sex:</label>
+        <select id="sex" name="sex">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
+        <button onclick="makePrediction()">Submit</button>
+        <h2 id="result"></h2>
+    </div>
+</body>
+</html>
